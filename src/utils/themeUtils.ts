@@ -1,4 +1,4 @@
-import { Theme } from '@types/index';
+import { Theme } from '../types/index';
 
 export const getStoredTheme = (): Theme => {
   const stored = localStorage.getItem('theme');

@@ -1,4 +1,4 @@
-import { Gallery } from '@types/index';
+import { Gallery } from '../types/index';
 
 export const GALLERY_DATA: Gallery = {
   'founding-designer': {

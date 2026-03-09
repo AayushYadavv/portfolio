@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { GalleryImage } from '@types/index';
+import { GalleryImage } from '../types/index';
 import '../styles/components/Gallery.css';
 
 interface GalleryProps {

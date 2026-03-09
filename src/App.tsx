@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, FC, RefObject } from "react";
+import { useState, useEffect, useRef, useCallback, FC } from "react";
 
 /* ── Theme definitions ─────────────────────────────────────────── */
 const THEMES = {
@@ -170,7 +170,7 @@ const FontLoader: FC = () => (
 );
 
 /* ── Custom Cursor ────────────────────────────────────────────── */
-const Cursor: FC<{ dark: boolean }> = ({ dark }) => {
+const Cursor: FC<{ dark: boolean }> = () => {
   const pointerRef = useRef<HTMLDivElement>(null);
   const tagRef = useRef<HTMLDivElement>(null);
   const entered = useRef(false);
@@ -181,20 +181,20 @@ const Cursor: FC<{ dark: boolean }> = ({ dark }) => {
     if (!pointer || !tag) return;
 
     function onMove(e: MouseEvent) {
-      pointer.style.left = `${e.clientX}px`;
-      pointer.style.top = `${e.clientY}px`;
-      tag.style.left = `${e.clientX + 18}px`;
-      tag.style.top = `${e.clientY + 18}px`;
+      pointer!.style.left = `${e.clientX}px`;
+      pointer!.style.top = `${e.clientY}px`;
+      tag!.style.left = `${e.clientX + 18}px`;
+      tag!.style.top = `${e.clientY + 18}px`;
       if (!entered.current) {
-        pointer.style.opacity = '1';
-        tag.style.opacity = '1';
+        pointer!.style.opacity = '1';
+        tag!.style.opacity = '1';
         entered.current = true;
       }
     }
 
     function onLeave() {
-      pointer.style.opacity = '0';
-      tag.style.opacity = '0';
+      pointer!.style.opacity = '0';
+      tag!.style.opacity = '0';
       entered.current = false;
     }
 
@@ -350,7 +350,7 @@ const HoverGallery: FC<HoverGalleryProps> = ({ activeKey, anchorEl, dark }) => {
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const [idx, setIdx] = useState(0);
-  const cycleRef = useRef<NodeJS.Timeout | null>(null);
+  const cycleRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const activeKeyRef = useRef(activeKey);
   const t = dark ? THEMES.dark : THEMES.light;
 
