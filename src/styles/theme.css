@@ -1,0 +1,27 @@
+/* Light Theme */
+:root {
+  --c-bg: #ffffff;
+  --c-bg2: #f5f5f5;
+  --c-ink: #1a1a1a;
+  --c-ink2: #4a4a4a;
+  --c-ink3: #d0d0d0;
+  --c-accent: #2563eb;
+  --c-btn: #e5e7eb;
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  --c-bg: #1a1a1a;
+  --c-bg2: #2d2d2d;
+  --c-ink: #f0f0f0;
+  --c-ink2: #b0b0b0;
+  --c-ink3: #4a4a4a;
+  --c-accent: #60a5fa;
+  --c-btn: #404040;
+}
+
+body {
+  background-color: var(--c-bg);
+  color: var(--c-ink);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

@@ -1,0 +1,55 @@
+.header {
+  padding: 40px 20px;
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-ink3);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--c-ink);
+}
+
+.logo .hi-word {
+  font-style: italic;
+  color: var(--c-accent);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--c-ink2);
+  margin-top: 8px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.header-divider {
+  text-align: center;
+  margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+  .logo h1 {
+    font-size: 32px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+}

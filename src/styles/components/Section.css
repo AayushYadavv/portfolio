@@ -1,0 +1,38 @@
+.section {
+  max-width: 1200px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+
+.section-header {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--c-ink);
+  margin: 0 0 15px 0;
+}
+
+.section-divider {
+  width: 60px;
+  height: 3px;
+  background: var(--c-accent);
+  border-radius: 2px;
+}
+
+.section-content {
+  animation: fadeUp 0.8s ease;
+}
+
+@media (max-width: 768px) {
+  .section {
+    margin: 60px auto;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+}
