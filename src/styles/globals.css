@@ -28,6 +28,15 @@ body {
   cursor: none !important;
 }
 
+/*Fonts*/
+@font-face {
+  font-family: "Argine";
+  src: url("./assets/Font/Argine.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Animations */
 @keyframes fadeUp {
   from {

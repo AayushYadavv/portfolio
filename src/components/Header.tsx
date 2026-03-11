@@ -12,7 +12,7 @@ const Header: FC<HeaderProps> = ({ onThemeToggle, theme }) => {
       <div className="header-content">
         <div className="logo">
           <h1 className="anim-fade-up-1">
-            Aayush <span className="hi-word">Yadav</span>
+            Bhavya <span className="hi-word">Chaurasia</span>
           </h1>
           <p className="subtitle anim-fade-up-2">Designer & Developer</p>
         </div>

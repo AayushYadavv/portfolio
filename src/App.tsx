@@ -1,180 +1,17 @@
-import { useState, useEffect, useRef, useCallback, FC } from "react";
-import { LinkedInIcon, MailIcon, PhoneIcon, SunIcon, MoonIcon, ArrowIcon } from "./components/icons/icons";
+import { useState,  useRef, useCallback, FC } from "react";
+import { ArrowIcon } from "./components/icons/icons";
 import { THEMES } from "./constants/themes";
-import { GALLERY, PALETTE } from "./constants/gallery";
 import FontLoader from "./styles/FontLoader";
 import HoverGallery from "./components/HoverGallery";
+import Cursor from "./components/Cursor";
+import GridCanvas from "./components/GridCanvas";
+import Navbar from "./components/navbar";
+import { Routes, Route } from "react-router-dom";
+import Project1 from "./pages/project1";
+import { Link } from "react-router-dom";
 
 /* ── Gallery data ─────────────────────────────────────────────── */
 
-/* ── Custom Cursor ────────────────────────────────────────────── */
-const Cursor: FC<{ dark: boolean }> = () => {
-  const pointerRef = useRef<HTMLDivElement>(null);
-  const tagRef = useRef<HTMLDivElement>(null);
-  const entered = useRef(false);
-
-  useEffect(() => {
-    const pointer = pointerRef.current;
-    const tag = tagRef.current;
-    if (!pointer || !tag) return;
-
-    function onMove(e: MouseEvent) {
-      pointer!.style.left = `${e.clientX}px`;
-      pointer!.style.top = `${e.clientY}px`;
-      tag!.style.left = `${e.clientX + 18}px`;
-      tag!.style.top = `${e.clientY + 18}px`;
-      if (!entered.current) {
-        pointer!.style.opacity = '1';
-        tag!.style.opacity = '1';
-        entered.current = true;
-      }
-    }
-
-    function onLeave() {
-      pointer!.style.opacity = '0';
-      tag!.style.opacity = '0';
-      entered.current = false;
-    }
-
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseleave', onLeave);
-
-    return () => {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseleave', onLeave);
-    };
-  }, []);
-
-  return (
-    <>
-      <style>{`* { cursor: none !important; }`}</style>
-      <div
-        ref={pointerRef}
-        style={{
-          position: 'fixed',
-          top: 0, left: 0,
-          width: 28, height: 28,
-          pointerEvents: 'none',
-          zIndex: 999999,
-          opacity: 0,
-          transition: 'opacity 0.2s ease',
-          transform: 'translate(-20%, -20%)'
-        }}
-      >
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}>
-          <path d="M4.5 4.5 L20 10.5 L12.5 12.5 L10.5 20 L4.5 4.5Z" fill="#141824" stroke="#ffffff" strokeWidth="1.5" strokeLinejoin="round" />
-        </svg>
-      </div>
-      <div
-        ref={tagRef}
-        style={{
-          position: 'fixed',
-          top: 0, left: 0,
-          background: '#141824',
-          color: '#ffffff',
-          padding: '6px 14px',
-          borderRadius: '20px',
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: '13px',
-          fontWeight: 600,
-          pointerEvents: 'none',
-          zIndex: 999998,
-          opacity: 0,
-          transition: 'opacity 0.2s ease',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          border: '1.5px solid rgba(255,255,255,0.1)'
-        }}
-      >
-        You
-      </div>
-    </>
-  );
-};
-
-/* ── Interactive Grid Canvas ──────────────────────────────────── */
-const GridCanvas: FC<{ dark: boolean }> = ({ dark }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const gmRef = useRef({ x: -9999, y: -9999 });
-  const cellsRef = useRef<Array<{ r: number; c: number; heat: number }>>([]);
-  const isDarkRef = useRef(dark);
-
-  useEffect(() => { isDarkRef.current = dark; }, [dark]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const CELL = 28;
-    let rafId: number;
-
-    function resize() {
-      if (!canvas) return;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const cols = Math.ceil(canvas.width / CELL) + 1;
-      const rows = Math.ceil(canvas.height / CELL) + 1;
-      cellsRef.current = [];
-      for (let r = 0; r < rows; r++)
-        for (let c = 0; c < cols; c++)
-          cellsRef.current.push({ r, c, heat: 0 });
-    }
-
-    function draw() {
-      if (!canvas || !ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const { x, y } = gmRef.current;
-      const dark = isDarkRef.current;
-      cellsRef.current.forEach(cell => {
-        const cx = cell.c * CELL, cy = cell.r * CELL;
-        const d = Math.hypot(cx - x, cy - y);
-        const t = Math.max(0, 1 - d / 180);
-        cell.heat += (t - cell.heat) * 0.12;
-        if (cell.heat > 0.015) {
-          const [r, g, b] = dark ? [224, 120, 72] : [196, 98, 45];
-          ctx.fillStyle = `rgba(${r},${g},${b},${cell.heat * 0.5})`;
-          ctx.fillRect(cx, cy, CELL, CELL);
-        }
-        ctx.strokeStyle = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)';
-        ctx.lineWidth = 0.5;
-        ctx.strokeRect(cx, cy, CELL, CELL);
-      });
-      rafId = requestAnimationFrame(draw);
-    }
-
-    function onMove(e: MouseEvent) {
-      if (!canvas) return;
-      const r = canvas.getBoundingClientRect();
-      gmRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
-    }
-    function onLeave() { gmRef.current = { x: -9999, y: -9999 }; }
-
-    canvas.parentElement?.addEventListener('mousemove', onMove);
-    canvas.parentElement?.addEventListener('mouseleave', onLeave);
-    window.addEventListener('resize', resize);
-
-    resize();
-    rafId = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      canvas.parentElement?.removeEventListener('mousemove', onMove);
-      canvas.parentElement?.removeEventListener('mouseleave', onLeave);
-      window.removeEventListener('resize', resize);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'absolute', inset: 0,
-        width: '100%', height: '100%',
-        pointerEvents: 'none', zIndex: 0,
-      }}
-    />
-  );
-};
 
 /* ── Highlight word ───────────────────────────────────────────── */
 interface HiProps {
@@ -220,82 +57,65 @@ const App: FC = () => {
 
   const hiProps = { accent: t.accent, ink: t.ink, onEnter: onHiEnter, onLeave: onHiLeave };
 
-  const iconLinkStyle: React.CSSProperties = {
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    width: 36, height: 36, borderRadius: '50%',
-    color: t.ink2, border: `1px solid ${t.border}`,
-    transition: 'color 0.2s, border-color 0.2s, transform 0.2s',
-    textDecoration: 'none',
-  };
+  // const iconLinkStyle: React.CSSProperties = {
+  //   display: 'flex', alignItems: 'center', justifyContent: 'center',
+  //   width: 36, height: 36, borderRadius: '50%',
+  //   color: t.ink2, border: `1px solid ${t.border}`,
+  //   transition: 'color 0.2s, border-color 0.2s, transform 0.2s',
+  //   textDecoration: 'none',
+  // };
 
   return (
-    <div style={{ background: t.bg, color: t.ink, fontFamily: "'DM Sans', sans-serif", fontWeight: 300, transition: 'background 0.3s, color 0.3s', minHeight: '100vh', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', boxSizing: 'border-box' }}>
-      <FontLoader />
+  <Routes>
+    <Route
+      path="/"
+      element={
+        <div
+          style={{
+            background: t.bg,
+            color: t.ink,
+            fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 300,
+            transition: "background 0.3s, color 0.3s",
+            minHeight: "100vh",
+            width: "100vw",
+            maxWidth: "100vw",
+            overflowX: "hidden",
+            boxSizing: "border-box",
+          }}
+        >
+          <FontLoader />
 
-      <style>{`
-        :root {
-          --c-accent: ${t.accent};
-          --c-ink: ${t.ink};
-          --c-ink2: ${t.ink2};
-          --c-ink3: ${t.ink3};
-          --c-bg2: ${t.bg2};
-          --c-btn: ${t.btn};
-          --c-border: ${t.border};
-        }
-      `}</style>
+          <style>{`
+            :root {
+              --c-accent: ${t.accent};
+              --c-ink: ${t.ink};
+              --c-ink2: ${t.ink2};
+              --c-ink3: ${t.ink3};
+              --c-bg2: ${t.bg2};
+              --c-btn: ${t.btn};
+              --c-border: ${t.border};
+            }
+          `}</style>
 
-      <Cursor dark={dark} />
+          <Cursor dark={dark} />
 
-      {/* ── Navbar ──────────────────────────────────────────────── */}
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 999999,
-        background: t.navBg,
-        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: `1px solid ${t.border}`,
-        height: 60,
-        display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center',
-        padding: '0 32px',
-        transition: 'background 0.3s, border-color 0.3s',
-      }}>
-        <a href="#" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 22, fontWeight: 700, fontStyle: 'italic', color: t.ink, letterSpacing: '0.01em', textDecoration: 'none' }}>
-          Bhavya
-        </a>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <a href="#" className="nav-icon-link" style={iconLinkStyle}><LinkedInIcon/></a>
-          <a href="mailto:bhavya@example.com" className="nav-icon-link" style={iconLinkStyle}><MailIcon /></a>
-          <a href="tel:+91" className="nav-icon-link" style={iconLinkStyle}><PhoneIcon /></a>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
-          {['Work', 'About', 'Resume'].map(l => (
-            <a key={l} href="#" className="nav-link" style={{ fontSize: 13, fontWeight: 400, letterSpacing: '0.04em', color: t.ink2, textDecoration: 'none', padding: '6px 12px', borderRadius: 20, transition: 'color 0.2s, background 0.2s' }}>
-              {l}
-            </a>
-          ))}
-          <button
-            className="theme-toggle"
-            onClick={() => setDark(d => !d)}
+          <Navbar dark={dark} setDark={setDark} />
+
+          {/* HERO SECTION */}
+          <section
+            id="hero"
             style={{
-              width: 36, height: 36, borderRadius: '50%',
-              border: `1px solid ${t.border}`, background: t.btn, color: t.ink2,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginLeft: 8, transition: 'all 0.2s',
+              position: "relative",
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              padding: "80px 0 60px",
+              width: "100%",
             }}
-          >
-            {dark ? <SunIcon /> : <MoonIcon />}
-          </button>
-        </div>
-      </nav>
-
-      {/* ── Hero ──────────────────────────────────────────────── */}
-      <section
-        id="hero"
-        style={{
-          position: 'relative', minHeight: '100vh',
-          display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          overflow: 'hidden', padding: '80px 0 60px',
-          width: '100%',
-        }}
       >
         <GridCanvas dark={dark} />
 
@@ -366,39 +186,117 @@ const App: FC = () => {
           <div className="scroll-line" />
           <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: t.ink3 }}>Scroll to explore</span>
         </div>
-      </section>
+        </section>
 
-      {/* ── Works ─────────────────────────────────────────────── */}
-      <section id="works" style={{ padding: '120px 10vw', position: 'relative', zIndex: 2 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 56 }}>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 400, color: t.ink }}>
-            Selected Work
-          </h2>
-          <a href="#" className="section-link" style={{ fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', color: t.ink3, textDecoration: 'none', borderBottom: `1px solid ${t.border}`, paddingBottom: 2, transition: 'color 0.2s, border-color 0.2s' }}>
-            View all &rarr;
-          </a>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
-          {[
-            { tag: 'AI / Product Design', title: 'Redesigning the Checkout Experience' },
-            { tag: 'Strategy / UX', title: 'AI Onboarding Flow' },
-            { tag: 'Systems Design', title: 'Design System at Scale' },
-            { tag: 'Research / Vision', title: 'Future of Conversational UI' },
-          ].map((card, i) => (
-            <div key={i} className="work-card">
-              <div style={{ aspectRatio: '16/9', background: t.btn, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.ink3, fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
-                Project Mockup
-              </div>
-              <div style={{ padding: '20px 24px' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: t.accent, marginBottom: 6 }}>{card.tag}</p>
-                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 400, color: t.ink }}>{card.title}</h3>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+          {/* WORKS */}
+          <section
+            id="works"
+            style={{ padding: "120px 10vw", position: "relative", zIndex: 2 }}
+          >
+            <div
+  style={{
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    marginBottom: 56,
+  }}
+>
+  <h2
+    style={{
+      fontFamily: "'Playfair Display', serif",
+      fontSize: "clamp(28px, 3.5vw, 44px)",
+      fontWeight: 400,
+      color: t.ink,
+    }}
+  >
+    Selected Work
+  </h2>
+
+  <a
+    href="#"
+    className="section-link"
+    style={{
+      fontSize: 12,
+      letterSpacing: "0.15em",
+      textTransform: "uppercase",
+      color: t.ink3,
+      textDecoration: "none",
+      borderBottom: `1px solid ${t.border}`,
+      paddingBottom: 2,
+      transition: "color 0.2s, border-color 0.2s",
+    }}
+  >
+    View all →
+  </a>
+</div>
+
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: 24,
+  }}
+>
+  {[
+    { tag: "AI / Product Design", title: "Redesigning the Checkout Experience" },
+    { tag: "Strategy / UX", title: "AI Onboarding Flow" },
+    { tag: "Systems Design", title: "Design System at Scale" },
+    { tag: "Research / Vision", title: "Future of Conversational UI" },
+  ].map((card, i) => (
+    <Link to="/project-1" key={i}>
+    <div className="work-card">
+      <div
+        style={{
+          aspectRatio: "16/9",
+          background: t.btn,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: t.ink3,
+          fontSize: 11,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+        }}
+      >
+        Project Mockup
+      </div>
+
+      <div style={{ padding: "20px 24px" }}>
+        <p
+          style={{
+            fontSize: 10,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: t.accent,
+            marginBottom: 6,
+          }}
+        >
+          {card.tag}
+        </p>
+
+        <h3
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 20,
+            fontWeight: 400,
+            color: t.ink,
+          }}
+        >
+          {card.title}
+        </h3>
+      </div>
     </div>
-  );
+    </Link>
+  ))}
+</div>
+          </section>
+        </div>
+      }
+    />
+
+    <Route path="/project-1" element={<Project1 />} />
+  </Routes>
+);
 };
 
 export default App;
