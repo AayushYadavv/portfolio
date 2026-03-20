@@ -1,61 +1,24 @@
-import { useState,  useRef, useCallback, FC } from "react";
-import { ArrowIcon } from "./components/icons/icons";
+﻿import { useState, FC } from "react";
+import Lottie from "lottie-react";
+import marutiAnimation from "./components/Mobile-app-showcase2.json";
 import { THEMES } from "./constants/themes";
 import FontLoader from "./styles/FontLoader";
-import HoverGallery from "./components/HoverGallery";
 import Cursor from "./components/Cursor";
-import GridCanvas from "./components/GridCanvas";
 import Navbar from "./components/navbar";
-import { Routes, Route } from "react-router-dom";
+import Hero from "./components/Hero.tsx";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Project1 from "./pages/project1";
+import Project2 from "./pages/Project2";
 import { Link } from "react-router-dom";
 
-/* ── Gallery data ─────────────────────────────────────────────── */
+/* â”€â”€ Gallery data */
 
 
-/* ── Highlight word ───────────────────────────────────────────── */
-interface HiProps {
-  dataKey: string;
-  children: React.ReactNode;
-  accent: string;
-  ink: string;
-  onEnter: (key: string, el: HTMLElement) => void;
-  onLeave: () => void;
-}
-
-const Hi: FC<HiProps> = ({ dataKey, children, accent, ink, onEnter, onLeave }) => {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [hovered, setHovered] = useState(false);
-  return (
-    <span
-      ref={ref}
-      className="hi-word"
-      style={{ color: hovered ? accent : ink }}
-      onMouseEnter={() => { setHovered(true); if (ref.current) onEnter(dataKey, ref.current); }}
-      onMouseLeave={() => { setHovered(false); onLeave(); }}
-    >
-      {children}
-    </span>
-  );
-};
-
-/* ── Main App ─────────────────────────────────────────────────── */
+/* â”€â”€ Main App  */
 const App: FC = () => {
+  const navigate = useNavigate();
   const [dark, setDark] = useState(false);
-  const [galleryKey, setGalleryKey] = useState<string | null>(null);
-  const [galleryAnchor, setGalleryAnchor] = useState<HTMLElement | null>(null);
   const t = dark ? THEMES.dark : THEMES.light;
-
-  const onHiEnter = useCallback((key: string, el: HTMLElement) => {
-    setGalleryKey(key);
-    setGalleryAnchor(el);
-  }, []);
-  const onHiLeave = useCallback(() => {
-    setGalleryKey(null);
-    setGalleryAnchor(null);
-  }, []);
-
-  const hiProps = { accent: t.accent, ink: t.ink, onEnter: onHiEnter, onLeave: onHiLeave };
 
   // const iconLinkStyle: React.CSSProperties = {
   //   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -96,207 +59,255 @@ const App: FC = () => {
               --c-btn: ${t.btn};
               --c-border: ${t.border};
             }
+            .card-wrap .view-link {
+              position: relative;
+              padding-bottom: 4px;
+            }
+            .card-wrap .view-link::after {
+              content: '';
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              width: 0;
+              height: 1px;
+              background: ${t.ink};
+              transition: width 0.35s ease;
+            }
+            .card-wrap:hover .view-link::after {
+              width: 100%;
+            }
+            @keyframes card1-swing {
+              0%   { left: 25%; top: 35.2%; opacity: 0; transform: scale(1); }
+              8%   { left: 25%; top: 35.2%; opacity: 1; transform: scale(1); }
+              50%  { left: 30%; top: 37%;   opacity: 1; transform: scale(1.7); }
+              82%  { left: 40%; top: 35%;   opacity: 1; transform: scale(2.3);   }
+              90%  { left: 40%; top: 35%;   opacity: 0; transform: scale(2.5);   }
+              91%  { left: 25%; top: 35.2%; opacity: 0; transform: scale(2.7); }
+              100% { left: 25%; top: 35.2%; opacity: 0; transform: scale(3); }
+            }
+            .card1-float {
+              position: absolute;
+              width: 13%;
+              height: auto;
+              pointer-events: none;
+              animation: card1-swing 5s ease-in-out infinite;
+            }
+            @keyframes brushReveal {
+              0%   { clip-path: inset(0% 100% 0% 0%); opacity: 0; }
+              8%   { clip-path: inset(0% 100% 0% 0%); opacity: 1; }
+              55%  { clip-path: inset(0% 0%   0% 0%); opacity: 1; }
+              70%  { clip-path: inset(0% 0%   0% 0%); opacity: 0; }
+              100% { clip-path: inset(0% 0%   0% 0%); opacity: 0; }
+            }
+            .card1-brush {
+              position: absolute;
+              top: 30%;
+              left: 30%;
+              width: 40%;
+              height: auto;
+              pointer-events: none;
+              animation: brushReveal 5s ease-in-out infinite;
+            }
           `}</style>
 
           <Cursor dark={dark} />
 
           <Navbar dark={dark} setDark={setDark} />
 
-          {/* HERO SECTION */}
-          <section
-            id="hero"
-            style={{
-              position: "relative",
-              minHeight: "100vh",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-              padding: "80px 0 60px",
-              width: "100%",
-            }}
-      >
-        <GridCanvas dark={dark} />
-
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-          background: `radial-gradient(ellipse 80% 80% at 50% 50%, transparent 25%, ${t.bg} 100%)`,
-          transition: 'background 0.3s',
-        }} />
-
-        {galleryKey && (
-          <HoverGallery activeKey={galleryKey} anchorEl={galleryAnchor} dark={dark} />
-        )}
-
-        <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: 860, padding: '0 32px', width: '100%' }}>
-
-          <p className="anim-fade-up-1" style={{ fontSize: 10, letterSpacing: '0.4em', textTransform: 'uppercase', color: t.ink3, marginBottom: 36, fontWeight: 500 }}>
-            Product Designer &amp; Strategist
-          </p>
-
-          <p className="anim-fade-up-2" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 'clamp(15px, 2vw, 24px)', textWrap: 'balance', maxWidth: 700, fontWeight: 300, lineHeight: 1.55, letterSpacing: '-0.01em', color: t.ink, transition: 'color 0.3s' }}>
-            <Hi dataKey="founding-designer" {...hiProps}>Founding Designer</Hi>
-            {' '}at AgentAnalytics.AI (
-            <span className="thub-wrap">
-              T&#8209;Hub
-              <span className="thub-note">
-                <svg width="30" height="20" viewBox="0 0 30 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transform: 'scaleX(-1)' }}>
-                  <path d="M4 3 C7 5, 14 9, 18 15" stroke={t.accent} strokeWidth="1.5" strokeLinecap="round" />
-                  <path d="M14 12.5 L18 15 L15.5 10.5" stroke={t.accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <span style={{ fontFamily: "'Caveat', cursive", fontSize: 13, fontWeight: 400, color: t.accent, lineHeight: 1.3, textAlign: 'left', marginBottom: 3, whiteSpace: 'nowrap' }}>
-                  world's largest innovation center
-                </span>
-              </span>
-            </span>
-            ), and a <Hi dataKey="cat-mom" {...hiProps}>cat mom</Hi> based in{' '}
-            <Hi dataKey="hyderabad" {...hiProps}>Hyderabad</Hi>,{' '}
-            designing humanist AI experiences.{' '}
-            Currently crafting AI experiences for{' '}
-            <Hi dataKey="waveflowdb" {...hiProps}>WaveflowDB</Hi>{' '}
-            and <Hi dataKey="waveflow-studio" {...hiProps}>Waveflow Studio</Hi>.<br />
-            Previously shaped products at Hashira and PossibleWorks.<br />
-            Passionate about working with startups to create magical experiences that drive growth.
-          </p>
-
-          <div className="anim-fade-up-3" style={{ marginTop: 44, display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'center' }}>
-            <a
-              href="#works"
-              className="btn-primary"
-              onClick={e => { e.preventDefault(); document.getElementById('works')?.scrollIntoView({ behavior: 'smooth' }); }}
-              style={{
-                background: t.ink, color: t.bg,
-                fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 500,
-                letterSpacing: '0.08em', textTransform: 'uppercase',
-                padding: '12px 28px', borderRadius: 40, border: 'none',
-                textDecoration: 'none', display: 'inline-block',
-                transition: 'background 0.2s, transform 0.2s',
-              }}
-            >
-              View Work
-            </a>
-            <a href="#" className="btn-secondary" style={{ fontSize: 13, color: t.ink3, textDecoration: 'none', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: 6, transition: 'color 0.2s' }}>
-              About me <ArrowIcon />
-            </a>
-          </div>
-        </div>
-
-        <div className="anim-fade-up-4" style={{ position: 'absolute', bottom: 36, left: '50%', transform: 'translateX(-50%)', zIndex: 2, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div className="scroll-line" />
-          <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: t.ink3 }}>Scroll to explore</span>
-        </div>
-        </section>
+          <Hero dark={dark} t={t} />
 
           {/* WORKS */}
           <section
             id="works"
             style={{ padding: "120px 10vw", position: "relative", zIndex: 2 }}
           >
-            <div
-  style={{
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    marginBottom: 56,
-  }}
->
-  <h2
-    style={{
-      fontFamily: "'Playfair Display', serif",
-      fontSize: "clamp(28px, 3.5vw, 44px)",
-      fontWeight: 400,
-      color: t.ink,
-    }}
-  >
-    Selected Work
-  </h2>
+            <h2
+              style={{
+                fontFamily: "'Libre Baskerville', serif",
+                fontSize: "clamp(28px, 3.5vw, 44px)",
+                fontWeight: 400,
+                fontStyle: "italic",
+                color: t.ink,
+                marginBottom: 72,
+              }}
+            >
+              Selected Work
+            </h2>
 
-  <a
-    href="#"
-    className="section-link"
-    style={{
-      fontSize: 12,
-      letterSpacing: "0.15em",
-      textTransform: "uppercase",
-      color: t.ink3,
-      textDecoration: "none",
-      borderBottom: `1px solid ${t.border}`,
-      paddingBottom: 2,
-      transition: "color 0.2s, border-color 0.2s",
-    }}
-  >
-    View all →
-  </a>
-</div>
+            {/* Project cards */}
+            {[
+              {
+                num: "01",
+                tags: "UX DESIGN, AI, PRODUCT DESIGN",
+                title: "Workflow Studio",
+                desc: "Designing AI experiences that enable anyone to automate workflows.",
+                link: "/project-1",
+                img: "/src/assets/project1.mp4",
+              },
+              {
+                num: "02",
+                tags: "UX DESIGN, AI, PRODUCT DESIGN",
+                title: "Maruti –⁠ Service Experience",
+                desc: `Reimagining servicing through improving
+transparency, cross-selling, and service adoption.`,
+                link: "/project-2",
+                img: "/src/assets/Frame1-maruti.svg",
+              },
+            ].map((card, i) => (
+              <div
+                key={i}
+                className="card-wrap"
+                onClick={() => navigate(card.link)}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: i % 2 === 0 ? "1.1fr 0.9fr" : "0.9fr 1.1fr",
+                  gap: 100,
+                  alignItems: "center",
+                  marginBottom: 96,
+                  cursor: "pointer",
+                }}
+              >
+                {/* Image */}
+                {i % 2 === 0 && (
+                  <div
+                    style={{
+                      borderRadius: 12,
+                      overflow: "hidden",
+                      background: i === 0 ? "#f5ede4" : t.btn,
+                      aspectRatio: "4/3",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
+                    }}
+                  >
+                    {i === 0 ? (
+                      <video
+                        src={card.img}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block",
+                        }}
+                      />
+                    ) : (
+                      <Lottie
+                        animationData={marutiAnimation}
+                        loop
+                        autoplay
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    )}
+                  </div>
+                )}
 
-<div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: 24,
-  }}
->
-  {[
-    { tag: "AI / Product Design", title: "Redesigning the Checkout Experience" },
-    { tag: "Strategy / UX", title: "AI Onboarding Flow" },
-    { tag: "Systems Design", title: "Design System at Scale" },
-    { tag: "Research / Vision", title: "Future of Conversational UI" },
-  ].map((card, i) => (
-    <Link to="/project-1" key={i}>
-    <div className="work-card">
-      <div
-        style={{
-          aspectRatio: "16/9",
-          background: t.btn,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: t.ink3,
-          fontSize: 11,
-          letterSpacing: "0.15em",
-          textTransform: "uppercase",
-        }}
-      >
-        Project Mockup
-      </div>
+                {/* Text */}
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" , ...(i % 2 !== 0 ? { alignItems: "flex-end", textAlign: "right" as const } : {}) }}>
+                  <span
+                    style={{
+                      fontFamily: "'Libre Baskerville', serif",
+                      fontStyle: "italic",
+                      fontSize: "clamp(42px, 5vw, 64px)",
+                      color: t.border,
+                      fontWeight: 400,
+                      lineHeight: 1,
+                      marginBottom: 20,
+                    }}
+                  >
+                    {card.num}
+                  </span>
+                  <p
+                    style={{
+                      fontSize: 12,
+                      letterSpacing: "0.2em",
+                      textTransform: "uppercase",
+                      color: t.ink3,
+                      marginBottom: 12,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {card.tags}
+                  </p>
+                  <h3
+                    style={{
+                      fontFamily: "'Libre Baskerville', serif",
+                      fontStyle: "italic",
+                      fontSize: "clamp(26px, 3vw, 38px)",
+                      fontWeight: 400,
+                      color: t.ink,
+                      marginBottom: 14,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {card.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: 17,
+                      color: t.ink2,
+                      lineHeight: 1.6,
+                      marginBottom: 28,
+                      maxWidth: 380,
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    {card.desc}
+                  </p>
+                  <Link
+                    to={card.link}
+                    className="view-link"
+                    style={{
+                      fontSize: 14,
+                      color: t.ink,
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      width: "fit-content",
+                    }}
+                  >
+                    View project <span style={{ fontSize: 16 }}>&rarr;</span>
+                  </Link>
+                </div>
 
-      <div style={{ padding: "20px 24px" }}>
-        <p
-          style={{
-            fontSize: 10,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: t.accent,
-            marginBottom: 6,
-          }}
-        >
-          {card.tag}
-        </p>
-
-        <h3
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 20,
-            fontWeight: 400,
-            color: t.ink,
-          }}
-        >
-          {card.title}
-        </h3>
-      </div>
-    </div>
-    </Link>
-  ))}
-</div>
+                {/* Image for odd rows (right side) */}
+                {i % 2 !== 0 && (
+                  <div
+                    style={{
+                      borderRadius: 12,
+                      overflow: "hidden",
+                      background: t.btn,
+                      aspectRatio: "4/3",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Lottie
+                      animationData={marutiAnimation}
+                      loop
+                      autoplay
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
           </section>
         </div>
       }
     />
 
     <Route path="/project-1" element={<Project1 />} />
+    <Route path="/project-2" element={<Project2 />} />
   </Routes>
 );
 };
 
 export default App;
+

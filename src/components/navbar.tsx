@@ -30,7 +30,7 @@ const Navbar: FC<NavbarProps> = ({ dark, setDark }) => {
       padding: '0 32px',
       transition: 'background 0.3s, border-color 0.3s',
     }}>
-      <a href="#" style={{ fontFamily: "'Argine', sans-serif", fontSize: 22, fontWeight: 700, fontStyle: 'italic', color: t.ink, letterSpacing: '0.01em', textDecoration: 'none' }}>
+      <a href="#" style={{ fontFamily: "'Argine', serif", fontSize: 22, fontWeight: 700, fontStyle: 'italic', color: t.ink, letterSpacing: '0.01em', textDecoration: 'none' }}>
         Bhavya
       </a>
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
