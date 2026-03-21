@@ -70,7 +70,7 @@ const HoverGallery: FC<HoverGalleryProps> = ({ activeKey, anchorEl, dark }) => {
         zIndex: 9000,
         pointerEvents: 'none',
         width: 200,
-        height: 160,
+        height: 132,
         borderRadius: 12,
         overflow: 'hidden',
         top: pos.top,

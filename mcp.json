@@ -1,0 +1,17 @@
+{
+  "servers": {
+    "figma-local": {
+      "type": "http",
+      "url": "http://127.0.0.1:3333/mcp"
+    },
+    "figma": {
+      "command": "npx",
+ 
+      "args": ["-y", "@anthropic-ai/mcp-figma"],
+      "env": {
+        "FIGMA_PERSONAL_ACCESS_TOKEN": "Yfigd_rE0nq_UdyrtRJcsMHRcMqOxZptF4bgQ1gB2jo0mk"
+      }
+    }
+  },
+  "inputs": []
+}
