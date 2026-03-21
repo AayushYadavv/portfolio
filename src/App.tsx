@@ -1,6 +1,7 @@
 ﻿import { useState, FC } from "react";
 import Lottie from "lottie-react";
 import marutiAnimation from "./components/Mobile-app-showcase2.json";
+import msmeChatbotAnimation from "./components/Mobile-app-showcase3.json";
 import { THEMES } from "./constants/themes";
 import FontLoader from "./styles/FontLoader";
 import Cursor from "./components/Cursor";
@@ -9,6 +10,7 @@ import Hero from "./components/Hero.tsx";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Project1 from "./pages/project1";
 import Project2 from "./pages/Project2";
+import Project3 from "./pages/Project3";
 import { Link } from "react-router-dom";
 
 /* â”€â”€ Gallery data */
@@ -153,6 +155,14 @@ transparency, cross-selling, and service adoption.`,
                 link: "/project-2",
                 img: "/src/assets/Frame1-maruti.svg",
               },
+              {
+                num: "03",
+                tags: "UX Design, AI, Government",
+                title: "Marga - AI Conversational Chatbot for MSMEs",
+                desc: "Dummy subtitle for now.",
+                link: "/project-3",
+                img: "/src/assets/Frame1-maruti.svg",
+              },
             ].map((card, i) => (
               <div
                 key={i}
@@ -163,7 +173,7 @@ transparency, cross-selling, and service adoption.`,
                   gridTemplateColumns: i % 2 === 0 ? "1.1fr 0.9fr" : "0.9fr 1.1fr",
                   gap: 100,
                   alignItems: "center",
-                  marginBottom: 96,
+                  marginBottom: 140,
                   cursor: "pointer",
                 }}
               >
@@ -197,7 +207,7 @@ transparency, cross-selling, and service adoption.`,
                       />
                     ) : (
                       <Lottie
-                        animationData={marutiAnimation}
+                        animationData={i === 2 ? msmeChatbotAnimation : marutiAnimation}
                         loop
                         autoplay
                         style={{ width: "100%", height: "100%" }}
@@ -289,7 +299,7 @@ transparency, cross-selling, and service adoption.`,
                     }}
                   >
                     <Lottie
-                      animationData={marutiAnimation}
+                      animationData={i === 2 ? msmeChatbotAnimation : marutiAnimation}
                       loop
                       autoplay
                       style={{ width: "100%", height: "100%" }}
@@ -305,6 +315,8 @@ transparency, cross-selling, and service adoption.`,
 
     <Route path="/project-1" element={<Project1 />} />
     <Route path="/project-2" element={<Project2 />} />
+    <Route path="/project-3" element={<Project3 />} />
+    <Route path="/Project-3" element={<Project3 />} />
   </Routes>
 );
 };
